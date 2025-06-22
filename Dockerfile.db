@@ -1,5 +1,0 @@
-# Dockerfile para o banco de dados PostgreSQL
-FROM postgres:16-alpine
-ENV POSTGRES_DB=escola
-ENV POSTGRES_USER=admin
-ENV POSTGRES_PASSWORD=admin
