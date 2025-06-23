@@ -31,6 +31,8 @@ Write-Host "Rodando seeds..."
 docker-compose exec backend sh -c "cd /app/APP && node run-seeds.js"
 
 Write-Host "Subindo frontend (Vite)..."
-cd frontend && npm install && npm run dev
-
+Set-Location -Path "$PSScriptRoot/frontend"
+npm install
+npm run dev
+Set-Location -Path $PSScriptRoot
 Write-Host "Tudo pronto! Backend, banco e frontend rodando."
