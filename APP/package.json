@@ -1,0 +1,17 @@
+{
+  "name": "escola-backend",
+  "version": "1.0.0",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "migrate": "DATABASE_URL=postgres://admin:admin@db:5432/escola node-pg-migrate up",
+    "migrate-down": "DATABASE_URL=postgres://admin:admin@db:5432/escola node-pg-migrate down"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "pg": "^8.16.0"
+  },
+  "devDependencies": {
+    "node-pg-migrate": "^8.0.2"
+  }
+}

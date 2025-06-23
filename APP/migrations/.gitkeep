@@ -1,0 +1,2 @@
+// Pasta de migrations para node-pg-migrate e scripts customizados.
+// Adicione arquivos de migration aqui, exemplo: 001_create_tabela.js
