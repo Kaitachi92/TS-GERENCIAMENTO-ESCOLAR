@@ -14,6 +14,9 @@ docker-compose up -d --build
 Write-Host "Aguardando banco de dados iniciar..."
 Start-Sleep -Seconds 10
 
+Write-Host "Instalando dependências do backend (APP)..."
+docker-compose exec backend npm install
+
 Write-Host "Rodando migrations..."
 docker-compose exec backend node run-migrations.js
 
