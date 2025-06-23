@@ -1,0 +1,200 @@
+.responsavel-list {
+  margin: 2rem auto;
+  max-width: 1100px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  padding: 2.5rem;
+}
+
+.responsavel-list h2 {
+  margin-bottom: 1.5rem;
+  color: #2d3a4b;
+  font-size: 2.1rem;
+  font-weight: 700;
+}
+
+.responsavel-list table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 1.08rem;
+  background: #f9fbfd;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.responsavel-list th, .responsavel-list td {
+  padding: 1.1rem 1.2rem;
+  text-align: left;
+  border-bottom: 1px solid #eaeaea;
+  vertical-align: middle;
+}
+
+.responsavel-list th {
+  background: #f5f7fa;
+  color: #2d3a4b;
+  font-weight: 700;
+  font-size: 1.1rem;
+  letter-spacing: 0.01em;
+}
+
+.responsavel-list tr:last-child td {
+  border-bottom: none;
+}
+
+.responsavel-list tbody tr {
+  background: #fff;
+  transition: background 0.2s;
+}
+.responsavel-list tbody tr:hover {
+  background: #f0f6ff;
+}
+
+.adicionar-responsavel-btn {
+  background: #2d8cff;
+  color: #fff;
+  font-weight: 600;
+  padding: 0.55rem 1.4rem;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 1.05rem;
+  transition: background 0.2s;
+  box-shadow: 0 1px 4px rgba(45,140,255,0.08);
+}
+.adicionar-responsavel-btn:hover {
+  background: #1a6ed8;
+}
+
+.importar-csv-btn {
+  background: #f39c12;
+  color: #fff;
+  font-weight: 600;
+  padding: 0.55rem 1.2rem;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 1.05rem;
+  transition: background 0.2s;
+  margin-left: 0.5rem;
+  box-shadow: 0 1px 4px rgba(243,156,18,0.08);
+}
+.importar-csv-btn:hover {
+  background: #d35400;
+}
+
+.btn-editar {
+  background: #2d8cff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 0.45rem 1.1rem;
+  margin-right: 0.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  box-shadow: 0 1px 4px rgba(45,140,255,0.08);
+}
+.btn-editar:hover {
+  background: #1a6ed8;
+}
+.btn-excluir {
+  background: #fff;
+  color: #e74c3c;
+  border: 2px solid #e74c3c;
+  border-radius: 4px;
+  padding: 0.45rem 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  margin-right: 0.5rem;
+  box-shadow: 0 1px 4px rgba(231,76,60,0.08);
+}
+.btn-excluir:hover {
+  background: #e74c3c;
+  color: #fff;
+}
+.btn-whatsapp {
+  background: #25d366;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 0.45rem 1.1rem;
+  margin-right: 0.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  box-shadow: 0 1px 4px rgba(37,211,102,0.08);
+}
+.btn-whatsapp:hover {
+  background: #128c7e;
+}
+.btn-email {
+  background: #0072c6;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 0.45rem 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  box-shadow: 0 1px 4px rgba(0,114,198,0.08);
+}
+.btn-email:hover {
+  background: #005a9e;
+}
+
+.filtros-responsavel input {
+  padding: 0.5rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 1.05rem;
+  background: #f8fafc;
+  transition: border 0.2s;
+}
+.filtros-responsavel input:focus {
+  border: 1.5px solid #2d8cff;
+  outline: none;
+}
+
+.form-responsavel {
+  display: flex;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+  margin: 1.2rem 0 2rem 0;
+}
+.form-responsavel input,
+.form-responsavel select {
+  padding: 0.45rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 1.05rem;
+  background: #f8fafc;
+}
+.form-responsavel button[type="submit"] {
+  background: #27ae60;
+  color: #fff;
+  font-weight: 600;
+  border: none;
+  border-radius: 4px;
+  padding: 0.45rem 1.2rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.form-responsavel button[type="submit"]:hover {
+  background: #219150;
+}
+.form-responsavel button[type="button"] {
+  background: #ccc;
+  color: #222;
+  border: none;
+  border-radius: 4px;
+  padding: 0.45rem 1.2rem;
+  cursor: pointer;
+  font-weight: 600;
+}
+.form-responsavel button[type="button"]:hover {
+  background: #b3b3b3;
+}
