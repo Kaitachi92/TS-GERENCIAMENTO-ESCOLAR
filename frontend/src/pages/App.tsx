@@ -38,21 +38,21 @@ const App: React.FC = () => {
     setLoadingAlunos(true);
     fetch('/alunos')
       .then(res => res.json())
-      .then(setAlunos)
+      .then(data => setAlunos(Array.isArray(data) ? data : []))
       .finally(() => setLoadingAlunos(false));
   };
   const fetchTurmas = () => {
     setLoadingTurmas(true);
     fetch('/turmas')
       .then(res => res.json())
-      .then(setTurmas)
+      .then(data => setTurmas(Array.isArray(data) ? data : []))
       .finally(() => setLoadingTurmas(false));
   };
   const fetchResponsaveis = () => {
     setLoadingResponsaveis(true);
     fetch('/responsaveis')
       .then(res => res.json())
-      .then(setResponsaveis)
+      .then(data => setResponsaveis(Array.isArray(data) ? data : []))
       .finally(() => setLoadingResponsaveis(false));
   };
 
@@ -81,7 +81,7 @@ const App: React.FC = () => {
         {aba === 'alunos' && (
           <section className="section-card">
             <CadastroAluno turmas={turmas} fetchAlunos={fetchAlunos} fetchResponsaveis={fetchResponsaveis} />
-            <AlunoList alunos={alunos} turmas={turmas} fetchAlunos={fetchAlunos} loading={loadingAlunos} />
+            <AlunoList turmas={turmas} fetchAlunos={fetchAlunos} loading={loadingAlunos} />
           </section>
         )}
         {aba === 'professores' && (
@@ -91,12 +91,12 @@ const App: React.FC = () => {
         )}
         {aba === 'turmas' && (
           <section className="section-card">
-            <TurmaList />
+            <TurmaList onTurmasChange={fetchTurmas} />
           </section>
         )}
         {aba === 'responsaveis' && (
           <section className="section-card">
-            <ResponsavelList responsaveis={responsaveis} loading={loadingResponsaveis} fetchResponsaveis={fetchResponsaveis} />
+            <ResponsavelList />
           </section>
         )}
         {aba === 'disciplinas' && (

@@ -30,6 +30,9 @@ docker-compose exec backend sh -c "cd /app/APP && node-pg-migrate up"
 Write-Host "Rodando seeds..."
 docker-compose exec backend sh -c "cd /app/APP && node run-seeds.js"
 
+Write-Host "Adicionando coluna turma_id na tabela alunos, se não existir..."
+docker-compose exec backend psql -U admin -d escola -c "ALTER TABLE alunos ADD COLUMN IF NOT EXISTS turma_id INTEGER REFERENCES turmas(id);"
+
 Write-Host "Subindo frontend (Vite)..."
 Set-Location -Path "$PSScriptRoot/frontend"
 npm install

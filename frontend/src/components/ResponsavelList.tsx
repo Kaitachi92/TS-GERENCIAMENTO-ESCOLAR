@@ -43,9 +43,16 @@ const ResponsavelList: React.FC = () => {
     doc_pendente: false
   });
 
+  // Sugestões de nomes de responsáveis para autocomplete
+  const nomesResponsaveis = Array.from(new Set(responsaveis.map(r => r.nome)));
+
+  // Carrega responsáveis do backend
   useEffect(() => {
     setLoading(true);
-    fetch('/responsaveis').then(res => res.json()).then(setResponsaveis).finally(() => setLoading(false));
+    fetch('/responsaveis')
+      .then(res => res.json())
+      .then(setResponsaveis)
+      .finally(() => setLoading(false));
     fetch('/alunos').then(res => res.json()).then(setAlunos);
   }, []);
 
@@ -59,24 +66,66 @@ const ResponsavelList: React.FC = () => {
       for (let i = 0; i < options.length; i++) {
         if (options[i].selected) selected.push(Number(options[i].value));
       }
+      console.log('Selecionados no select de alunos:', selected);
       setNovo({ ...novo, alunos: selected });
     } else {
       setNovo({ ...novo, [name]: value });
     }
   };
 
+  // Salva novo responsável ou edita existente no backend
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('Valor de novo.alunos no submit:', novo.alunos);
+    // Garante que o campo alunos seja sempre um array de números
+    const payload = { ...novo, alunos: Array.isArray(novo.alunos) ? novo.alunos.map(Number) : [] };
+    console.log('Enviando para o backend (payload final):', payload);
     if (editId) {
-      setResponsaveis(responsaveis.map(r => r.id === editId ? { ...novo, id: editId } : r));
+      fetch(`/responsaveis/${editId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...payload, id: editId })
+      })
+        .then(response => {
+          if (response.ok) {
+            setShowForm(false);
+            setEditId(null);
+            setNovo({ id: 0, nome: '', cpf: '', telefone: '', email: '', parentesco: '', endereco: '', alunos: [], observacoes: '', pagador_principal: false, acesso_portal: false, doc_pendente: false });
+            setLoading(true);
+            fetch('/responsaveis').then(res => res.json()).then(setResponsaveis).finally(() => setLoading(false));
+          } else {
+            alert('Erro ao salvar responsável!');
+          }
+        })
+        .catch(err => {
+          console.error('Erro no fetch do handleSubmit:', err);
+          alert('Erro inesperado ao salvar responsável!');
+        });
     } else {
-      setResponsaveis([...responsaveis, { ...novo, id: Date.now() }]);
+      fetch('/responsaveis', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+        .then(response => {
+          if (response.ok) {
+            setShowForm(false);
+            setEditId(null);
+            setNovo({ id: 0, nome: '', cpf: '', telefone: '', email: '', parentesco: '', endereco: '', alunos: [], observacoes: '', pagador_principal: false, acesso_portal: false, doc_pendente: false });
+            setLoading(true);
+            fetch('/responsaveis').then(res => res.json()).then(setResponsaveis).finally(() => setLoading(false));
+          } else {
+            alert('Erro ao salvar responsável!');
+          }
+        })
+        .catch(err => {
+          console.error('Erro no fetch do handleSubmit:', err);
+          alert('Erro inesperado ao salvar responsável!');
+        });
     }
-    setShowForm(false);
-    setEditId(null);
-    setNovo({ id: 0, nome: '', cpf: '', telefone: '', email: '', parentesco: '', endereco: '', alunos: [], observacoes: '', pagador_principal: false, acesso_portal: false, doc_pendente: false });
   };
 
+  // Editar responsável
   const handleEditar = (id: number) => {
     const r = responsaveis.find(r => r.id === id);
     if (r) {
@@ -86,8 +135,11 @@ const ResponsavelList: React.FC = () => {
     }
   };
 
-  const handleExcluir = (id: number) => {
-    setResponsaveis(responsaveis.filter(r => r.id !== id));
+  // Excluir responsável do backend
+  const handleExcluir = async (id: number) => {
+    await fetch(`/responsaveis/${id}`, { method: 'DELETE' });
+    setLoading(true);
+    fetch('/responsaveis').then(res => res.json()).then(setResponsaveis).finally(() => setLoading(false));
   };
 
   const handleWhatsapp = (telefone: string) => {
@@ -100,10 +152,13 @@ const ResponsavelList: React.FC = () => {
   };
 
   const responsaveisFiltrados = responsaveis.filter(r =>
-    (!filtro.nome || r.nome.toLowerCase().includes(filtro.nome.toLowerCase())) &&
-    (!filtro.cpf || r.cpf.includes(filtro.cpf)) &&
-    (!filtro.aluno || r.alunos.some(aid => alunos.find(a => a.id === aid)?.nome.toLowerCase().includes(filtro.aluno.toLowerCase()))) &&
-    (!filtro.parentesco || r.parentesco.toLowerCase().includes(filtro.parentesco.toLowerCase()))
+    (!filtro.nome || (r.nome && r.nome.toLowerCase().includes(filtro.nome.toLowerCase()))) &&
+    (!filtro.cpf || (r.cpf && r.cpf.includes(filtro.cpf))) &&
+    (!filtro.aluno || (Array.isArray(r.alunos) && r.alunos.length > 0 && r.alunos.some(aid => {
+      const aluno = alunos.find(a => a.id === aid);
+      return aluno && aluno.nome && aluno.nome.toLowerCase().includes(filtro.aluno.toLowerCase());
+    }))) &&
+    (!filtro.parentesco || (r.parentesco && r.parentesco.toLowerCase().includes(filtro.parentesco.toLowerCase())))
   );
 
   const handleImportarCSV = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -135,8 +190,24 @@ const ResponsavelList: React.FC = () => {
     reader.readAsText(file);
   };
 
+  // Botão de teste para disparar fetch manualmente
+  const testeFetch = () => {
+    fetch('/responsaveis', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nome: 'TesteBotao', cpf: '999' })
+    })
+      .then(r => r.json())
+      .then(console.log)
+      .catch(console.error);
+  };
+
+  console.log('ResponsavelList renderizado');
+  console.log('Valor atual de novo.alunos:', novo.alunos);
+
   return (
     <div className="responsavel-list">
+      {/* Remover botão de teste */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h2>Lista de Responsáveis</h2>
         <div>
@@ -148,21 +219,47 @@ const ResponsavelList: React.FC = () => {
         </div>
       </div>
       <div className="filtros-responsavel" style={{ margin: '1rem 0', display: 'flex', gap: '1rem' }}>
-        <input name="nome" placeholder="Filtrar por Nome" value={filtro.nome} onChange={e => setFiltro({ ...filtro, nome: e.target.value })} />
+        <input name="nome" placeholder="Filtrar por Nome" value={filtro.nome} onChange={e => setFiltro({ ...filtro, nome: e.target.value })} list="sugestoes-resp-busca" />
+        <datalist id="sugestoes-resp-busca">
+          {nomesResponsaveis.map(nome => (
+            <option key={nome} value={nome} />
+          ))}
+        </datalist>
         <input name="cpf" placeholder="Filtrar por CPF" value={filtro.cpf} onChange={e => setFiltro({ ...filtro, cpf: e.target.value })} />
         <input name="aluno" placeholder="Filtrar por Aluno" value={filtro.aluno} onChange={e => setFiltro({ ...filtro, aluno: e.target.value })} />
         <input name="parentesco" placeholder="Filtrar por Parentesco" value={filtro.parentesco} onChange={e => setFiltro({ ...filtro, parentesco: e.target.value })} />
       </div>
       {showForm && (
-        <form className="form-responsavel" onSubmit={handleSubmit} style={{ marginBottom: '2rem', display: 'flex', flexWrap: 'wrap', gap: '0.7rem' }}>
-          <input name="nome" placeholder="Nome completo" value={novo.nome} onChange={handleChange} required />
-          <input name="cpf" placeholder="CPF" value={novo.cpf} onChange={handleChange} required pattern="\d{3}\.\d{3}\.\d{3}-\d{2}" />
-          <input name="telefone" placeholder="Telefone (WhatsApp)" value={novo.telefone} onChange={handleChange} required />
-          <input name="email" placeholder="E-mail" value={novo.email} onChange={handleChange} required />
-          <input name="parentesco" placeholder="Parentesco" value={novo.parentesco} onChange={handleChange} required />
+        alunos.length === 0 ? (
+          <div style={{color:'red',marginBottom:16}}>
+            Cadastre pelo menos um aluno antes de adicionar um responsável.
+          </div>
+        ) : (
+        <div className="form-responsavel" style={{ marginBottom: '2rem', display: 'flex', flexWrap: 'wrap', gap: '0.7rem' }}>
+          <input name="nome" placeholder="Nome completo" value={novo.nome} onChange={handleChange} />
+          <datalist id="sugestoes-resp-cadastro">
+            {nomesResponsaveis.map(nome => (
+              <option key={nome} value={nome} />
+            ))}
+          </datalist>
+          <input name="cpf" placeholder="CPF" value={novo.cpf} onChange={handleChange} />
+          <input name="telefone" placeholder="Telefone (WhatsApp)" value={novo.telefone} onChange={handleChange} />
+          <input name="email" placeholder="E-mail" value={novo.email} onChange={handleChange} />
+          <input name="parentesco" placeholder="Parentesco" value={novo.parentesco} onChange={handleChange} />
           <input name="endereco" placeholder="Endereço (opcional)" value={novo.endereco} onChange={handleChange} />
           <select name="alunos" multiple value={novo.alunos.map(String)} onChange={handleChange} style={{ minWidth: 180, minHeight: 60 }}>
-            {alunos.map(a => <option key={a.id} value={a.id}>{a.nome}</option>)}
+            {alunos.map(a => (
+              <option
+                key={a.id}
+                value={String(a.id)}
+                style={{
+                  background: novo.alunos.includes(a.id) ? '#d1e7dd' : undefined,
+                  fontWeight: novo.alunos.includes(a.id) ? 'bold' : undefined
+                }}
+              >
+                {a.nome} {novo.alunos.includes(a.id) ? '✓' : ''}
+              </option>
+            ))}
           </select>
           <input name="observacoes" placeholder="Observações" value={novo.observacoes} onChange={handleChange} />
           <label style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
@@ -174,9 +271,10 @@ const ResponsavelList: React.FC = () => {
           <label style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
             <input type="checkbox" name="doc_pendente" checked={!!novo.doc_pendente} onChange={handleChange} /> Documentação Pendente
           </label>
-          <button type="submit">Salvar</button>
+          <button type="button" onClick={handleSubmit}>Salvar</button>
           <button type="button" onClick={() => { setShowForm(false); setEditId(null); }} style={{ background: '#ccc', color: '#222' }}>Cancelar</button>
-        </form>
+        </div>
+        )
       )}
       {loading ? <p>Carregando...</p> : (
         <table>

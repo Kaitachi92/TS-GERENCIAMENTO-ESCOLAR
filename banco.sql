@@ -18,6 +18,7 @@ CREATE TABLE responsaveis (
 CREATE TABLE alunos (
     id SERIAL PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
+    turma_id INTEGER REFERENCES turmas(id),
     data_nascimento DATE,
     cpf VARCHAR(14),
     rg VARCHAR(20),
