@@ -6,12 +6,36 @@ export default defineConfig({
   server: {
     port: 5173,
     proxy: {
-      '/alunos': 'http://localhost:3000',
-      '/turmas': 'http://localhost:3000',
-      '/professores': 'http://localhost:3000',
-      '/responsaveis': 'http://localhost:3000',
-      '/disciplinas': 'http://localhost:3000',
-      '/mensalidades': 'http://localhost:3000'
-    }
-  }
+      '/alunos': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+        secure: false,
+      },
+      '/turmas': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+        secure: false,
+      },
+      '/professores': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+        secure: false,
+      },
+      '/responsaveis': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+        secure: false,
+      },
+      '/disciplinas': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+        secure: false,
+      },
+      '/mensalidades': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+        secure: false,
+      },
+    },
+  },
 });

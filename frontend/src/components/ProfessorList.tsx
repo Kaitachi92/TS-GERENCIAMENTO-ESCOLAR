@@ -12,18 +12,23 @@ const ProfessorList: React.FC = () => {
   const [nome, setNome] = useState('');
   const [turmaId, setTurmaId] = useState<number | ''>('');
   const [loading, setLoading] = useState(false);
+  const [busca, setBusca] = useState('');
+  const [buscaTurma, setBuscaTurma] = useState('');
 
-  // Simulação: não há endpoint de professor_turma, então só mostra o nome da turma vinculada no cadastro
+  // Sugestões de nomes para autocomplete
+  const nomesProfessores = Array.from(new Set(professores.map(p => p.nome)));
+
+  // Carrega professores do backend
   useEffect(() => {
+    setLoading(true);
     fetch('/professores')
       .then(res => res.json())
-      .then(data => {
-        console.log('PROFESSORES FETCHED:', data);
-        setProfessores(data);
-      });
+      .then(data => setProfessores(data))
+      .finally(() => setLoading(false));
     fetch('/turmas').then(res => res.json()).then(setTurmas);
   }, []);
 
+  // Adiciona novo professor no backend
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     // Validação: nome não pode ser vazio nem só número
@@ -36,8 +41,7 @@ const ProfessorList: React.FC = () => {
     });
     setNome('');
     setTurmaId('');
-    fetch('/professores').then(res => res.json()).then(setProfessores);
-    setLoading(false);
+    fetch('/professores').then(res => res.json()).then(setProfessores).finally(() => setLoading(false));
   };
 
   // Função auxiliar para mostrar nomes das turmas vinculadas
@@ -49,15 +53,39 @@ const ProfessorList: React.FC = () => {
       .join(', ');
   }
 
-  // Função para remover professor
+  // Remove professor do backend
   const handleDelete = async (id: number) => {
+    setLoading(true);
     await fetch(`/professores/${id}`, { method: 'DELETE' });
-    fetch('/professores').then(res => res.json()).then(setProfessores);
+    fetch('/professores').then(res => res.json()).then(setProfessores).finally(() => setLoading(false));
   };
 
   return (
     <div className="aluno-list">
       <h2>Cadastro de Professores</h2>
+      <input
+        type="text"
+        placeholder="Buscar por nome"
+        value={busca}
+        onChange={e => setBusca(e.target.value)}
+        style={{ marginBottom: 8, padding: 8, borderRadius: 8, border: '1px solid #ccc', width: 300, marginRight: 8 }}
+        list="sugestoes-prof-busca"
+      />
+      <datalist id="sugestoes-prof-busca">
+        {nomesProfessores.map(nome => (
+          <option key={nome} value={nome} />
+        ))}
+      </datalist>
+      <select
+        value={buscaTurma}
+        onChange={e => setBuscaTurma(e.target.value)}
+        style={{ marginBottom: 16, padding: 8, borderRadius: 8, border: '1px solid #ccc', width: 220 }}
+      >
+        <option value="">Filtrar por turma</option>
+        {turmas.map(turma => (
+          <option key={turma.id} value={turma.nome}>{turma.nome}</option>
+        ))}
+      </select>
       <form onSubmit={handleSubmit} style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
         <input
           type="text"
@@ -65,7 +93,13 @@ const ProfessorList: React.FC = () => {
           onChange={e => setNome(e.target.value)}
           placeholder="Nome do professor"
           style={{ flex: 1, borderRadius: 8, border: '1px solid #ccc', padding: 8 }}
+          list="sugestoes-prof-cadastro"
         />
+        <datalist id="sugestoes-prof-cadastro">
+          {nomesProfessores.map(nome => (
+            <option key={nome} value={nome} />
+          ))}
+        </datalist>
         <select
           value={turmaId}
           onChange={e => setTurmaId(Number(e.target.value))}
@@ -89,10 +123,20 @@ const ProfessorList: React.FC = () => {
           </tr>
         </thead>
         <tbody>
-          {professores.length === 0 ? (
+          {professores.filter(p => {
+            const nomeOk = p.nome.toLowerCase().includes(busca.toLowerCase());
+            const turmaNomes = getTurmasNomes(p).toLowerCase();
+            const turmaOk = !buscaTurma || turmaNomes.split(', ').includes(buscaTurma.toLowerCase());
+            return nomeOk && turmaOk;
+          }).length === 0 ? (
             <tr><td colSpan={3} style={{textAlign:'center'}}>Nenhum professor cadastrado.</td></tr>
           ) : (
-            professores.map((prof: any) => (
+            professores.filter(p => {
+              const nomeOk = p.nome.toLowerCase().includes(busca.toLowerCase());
+              const turmaNomes = getTurmasNomes(p).toLowerCase();
+              const turmaOk = !buscaTurma || turmaNomes.split(', ').includes(buscaTurma.toLowerCase());
+              return nomeOk && turmaOk;
+            }).map((prof: any) => (
               <tr key={prof.id}>
                 <td>{prof.nome}</td>
                 <td>{getTurmasNomes(prof)}</td>

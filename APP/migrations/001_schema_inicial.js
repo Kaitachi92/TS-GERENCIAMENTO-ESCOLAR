@@ -10,10 +10,19 @@ module.exports = {
       email: 'varchar(120)',
       endereco: 'varchar(200)'
     });
+    // Turmas (deve ser criada antes de alunos)
+    pgm.createTable('turmas', {
+      id: { type: 'serial', primaryKey: true },
+      nome: { type: 'varchar(100)', notNull: true },
+      ano_letivo: 'integer',
+      turno: 'varchar(20)',
+      nivel_ensino: 'varchar(40)'
+    });
     // Alunos
     pgm.createTable('alunos', {
       id: { type: 'serial', primaryKey: true },
       nome: { type: 'varchar(100)', notNull: true },
+      turma_id: { type: 'integer', references: 'turmas' },
       data_nascimento: 'date',
       cpf: 'varchar(14)',
       rg: 'varchar(20)',
@@ -22,14 +31,6 @@ module.exports = {
       email: 'varchar(120)',
       telefone: 'varchar(20)',
       responsavel_id: { type: 'integer', references: 'responsaveis', onDelete: 'set null' }
-    });
-    // Turmas
-    pgm.createTable('turmas', {
-      id: { type: 'serial', primaryKey: true },
-      nome: { type: 'varchar(100)', notNull: true },
-      ano_letivo: 'integer',
-      turno: 'varchar(20)',
-      nivel_ensino: 'varchar(40)'
     });
     // Professores
     pgm.createTable('professores', {
@@ -43,8 +44,14 @@ module.exports = {
     pgm.createTable('disciplinas', {
       id: { type: 'serial', primaryKey: true },
       nome: { type: 'varchar(100)', notNull: true },
-      carga_horaria: 'integer',
-      ano_serie: 'integer'
+      turma: { type: 'varchar(100)' },
+      professor: { type: 'varchar(100)' },
+      carga_horaria: { type: 'varchar(20)' },
+      turno: { type: 'varchar(20)' },
+      observacoes: { type: 'text' },
+      ano_letivo: { type: 'varchar(10)' },
+      area_conhecimento: { type: 'varchar(100)' },
+      optativa: { type: 'boolean' }
     });
     // Usuários
     pgm.createTable('usuarios', {
@@ -58,6 +65,7 @@ module.exports = {
     pgm.createTable('mensalidades', {
       id: { type: 'serial', primaryKey: true },
       aluno_id: { type: 'integer', references: 'alunos', notNull: true, onDelete: 'cascade' },
+      turma: { type: 'varchar(100)' }, // Adicionada coluna turma
       referencia_mes: { type: 'varchar(7)', notNull: true },
       valor: { type: 'numeric(10,2)', notNull: true },
       status: { type: 'varchar(20)', notNull: true },

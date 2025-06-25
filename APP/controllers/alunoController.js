@@ -1,59 +1,76 @@
-const Aluno = require('../models/aluno');
+const pool = require('../config/pg');
 
-// Lista de alunos em memória (simulação)
-let alunos = [
-    { id: 1, nome: 'João' }
-];
-let nextId = 2;
+function validarNome(nome) {
+  return nome && typeof nome === 'string';
+}
 
 function validarTurmaId(turma_id) {
   return typeof turma_id === 'number' && !isNaN(turma_id);
 }
 
-exports.listarAlunos = (req, res) => {
-    res.json(alunos);
+// CRUD de Alunos usando PostgreSQL
+exports.listarAlunos = async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM alunos ORDER BY id');
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ erro: 'Erro ao buscar alunos.' });
+  }
 };
 
-exports.criarAluno = (req, res) => {
+exports.criarAluno = async (req, res) => {
   const { nome, turma_id } = req.body;
-  if (!nome || typeof nome !== 'string') {
+  if (!validarNome(nome)) {
     return res.status(400).json({ erro: 'Nome é obrigatório.' });
   }
-  if (!validarTurmaId(turma_id)) {
+  if (!validarTurmaId(Number(turma_id))) {
     return res.status(400).json({ erro: 'Turma é obrigatória.' });
   }
-  const novoAluno = { id: nextId++, nome, turma_id };
-  alunos.push(novoAluno);
-  res.status(201).json(novoAluno);
+  try {
+    const result = await pool.query('INSERT INTO alunos (nome, turma_id) VALUES ($1, $2) RETURNING *', [nome, turma_id]);
+    return res.status(201).json(result.rows[0]);
+  } catch (err) {
+    console.error('Erro ao criar aluno:', err); // Adiciona log detalhado
+    return res.status(500).json({ erro: 'Erro ao criar aluno.' });
+  }
 };
 
-exports.buscarAluno = (req, res) => {
-    const id = parseInt(req.params.id);
-    const aluno = alunos.find(a => a.id === id);
-    if (!aluno) return res.status(404).json({ erro: 'Aluno não encontrado.' });
-    res.json(aluno);
+exports.buscarAluno = async (req, res) => {
+  const id = parseInt(req.params.id);
+  try {
+    const result = await pool.query('SELECT * FROM alunos WHERE id = $1', [id]);
+    if (result.rows.length === 0) return res.status(404).json({ erro: 'Aluno não encontrado.' });
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ erro: 'Erro ao buscar aluno.' });
+  }
 };
 
-exports.atualizarAluno = (req, res) => {
+exports.atualizarAluno = async (req, res) => {
   const id = parseInt(req.params.id);
   const { nome, turma_id } = req.body;
-  const aluno = alunos.find(a => a.id === id);
-  if (!aluno) return res.status(404).json({ erro: 'Aluno não encontrado.' });
-  if (!nome || typeof nome !== 'string') {
+  if (!validarNome(nome)) {
     return res.status(400).json({ erro: 'Nome é obrigatório.' });
   }
-  if (!validarTurmaId(turma_id)) {
+  if (!validarTurmaId(Number(turma_id))) {
     return res.status(400).json({ erro: 'Turma é obrigatória.' });
   }
-  aluno.nome = nome;
-  aluno.turma_id = turma_id;
-  res.json(aluno);
+  try {
+    const result = await pool.query('UPDATE alunos SET nome = $1, turma_id = $2 WHERE id = $3 RETURNING *', [nome, turma_id, id]);
+    if (result.rows.length === 0) return res.status(404).json({ erro: 'Aluno não encontrado.' });
+    return res.json(result.rows[0]);
+  } catch (err) {
+    return res.status(500).json({ erro: 'Erro ao atualizar aluno.' });
+  }
 };
 
-exports.deletarAluno = (req, res) => {
-    const id = parseInt(req.params.id);
-    const index = alunos.findIndex(a => a.id === id);
-    if (index === -1) return res.status(404).json({ erro: 'Aluno não encontrado.' });
-    alunos.splice(index, 1);
+exports.deletarAluno = async (req, res) => {
+  const id = parseInt(req.params.id);
+  try {
+    const result = await pool.query('DELETE FROM alunos WHERE id = $1 RETURNING *', [id]);
+    if (result.rows.length === 0) return res.status(404).json({ erro: 'Aluno não encontrado.' });
     res.status(204).send();
+  } catch (err) {
+    res.status(500).json({ erro: 'Erro ao deletar aluno.' });
+  }
 };

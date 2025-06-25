@@ -34,14 +34,8 @@ const CadastroAluno: React.FC<Props> = ({ turmas, fetchAlunos, fetchResponsaveis
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        ...form,
-        turma_id: Number(form.turma_id),
-        numero: form.numero || undefined,
-        email: form.email || undefined,
-        cidade: form.cidade || undefined,
-        bairro: form.bairro || undefined,
-        cep: form.cep || undefined,
-        numero_responsavel: form.numero_responsavel || undefined
+        nome: form.nome,
+        turma_id: Number(form.turma_id)
       })
     });
     setForm({ nome: '', numero: '', email: '', cidade: '', bairro: '', cep: '', numero_responsavel: '', turma_id: '' });

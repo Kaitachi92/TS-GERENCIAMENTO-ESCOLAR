@@ -6,12 +6,16 @@ type Turma = {
   nome: string;
 };
 
-const TurmaList: React.FC = () => {
+// Adiciona prop opcional para notificar mudanças
+const TurmaList: React.FC<{ onTurmasChange?: () => void }> = ({ onTurmasChange }) => {
   const [turmas, setTurmas] = useState<Turma[]>([]);
   const [nome, setNome] = useState('');
   const [loading, setLoading] = useState(false);
   const [editId, setEditId] = useState<number | null>(null);
   const [editNome, setEditNome] = useState('');
+
+  // Sugestões de nomes de turmas para autocomplete
+  const nomesTurmas = Array.from(new Set(turmas.map(t => t.nome)));
 
   const fetchTurmas = () => {
     setLoading(true);
@@ -19,6 +23,7 @@ const TurmaList: React.FC = () => {
       .then(res => res.json())
       .then(data => setTurmas(data))
       .finally(() => setLoading(false));
+    if (onTurmasChange) onTurmasChange();
   };
 
   useEffect(() => {
@@ -27,19 +32,30 @@ const TurmaList: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!nome.trim()) return;
-    await fetch('/turmas', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ nome })
-    });
-    setNome('');
+    if (editId) {
+      await fetch(`/turmas/${editId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nome: editNome })
+      });
+      setEditId(null);
+      setEditNome('');
+    } else {
+      await fetch('/turmas', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nome })
+      });
+      setNome('');
+    }
     fetchTurmas();
+    if (onTurmasChange) onTurmasChange();
   };
 
   const handleDelete = async (id: number) => {
     await fetch(`/turmas/${id}`, { method: 'DELETE' });
     fetchTurmas();
+    if (onTurmasChange) onTurmasChange();
   };
 
   const handleEdit = (turma: Turma) => {
@@ -70,7 +86,13 @@ const TurmaList: React.FC = () => {
           onChange={e => setNome(e.target.value)}
           placeholder="Nome da turma"
           style={{ flex: 1, borderRadius: 8, border: '1px solid #ccc', padding: 8 }}
+          list="sugestoes-turma-cadastro"
         />
+        <datalist id="sugestoes-turma-cadastro">
+          {nomesTurmas.map(nome => (
+            <option key={nome} value={nome} />
+          ))}
+        </datalist>
         <button className="btn-pill" type="submit">adicionar</button>
       </form>
       {loading ? <p>Carregando...</p> : (
@@ -84,7 +106,13 @@ const TurmaList: React.FC = () => {
                     value={editNome}
                     onChange={e => setEditNome(e.target.value)}
                     style={{ flex: 1, borderRadius: 8, border: '1px solid #ccc', padding: 8 }}
+                    list="sugestoes-turma-editar"
                   />
+                  <datalist id="sugestoes-turma-editar">
+                    {nomesTurmas.map(nome => (
+                      <option key={nome} value={nome} />
+                    ))}
+                  </datalist>
                   <button className="btn-pill" type="submit">salvar</button>
                   <button className="btn-pill" type="button" onClick={() => setEditId(null)}>cancelar</button>
                 </form>

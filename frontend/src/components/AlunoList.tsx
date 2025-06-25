@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './AlunoList.scss';
 
 type Aluno = {
@@ -9,21 +9,36 @@ type Aluno = {
 type Turma = { id: number; nome: string };
 
 type Props = {
-  alunos: Aluno[];
   turmas: Turma[];
   fetchAlunos: () => void;
   loading: boolean;
 };
 
-const AlunoList: React.FC<Props> = ({ alunos, turmas, fetchAlunos, loading }) => {
+const AlunoList: React.FC<Props> = ({ turmas, fetchAlunos, loading }) => {
+  const [alunosState, setAlunosState] = useState<Aluno[]>([]);
+  const [loadingState, setLoadingState] = useState(false);
   const [editId, setEditId] = useState<number | null>(null);
   const [editNome, setEditNome] = useState('');
   const [editTurmaId, setEditTurmaId] = useState<number | ''>('');
   const [search, setSearch] = useState('');
 
+  // Atualiza lista de alunos sempre que prop alunos mudar
+  useEffect(() => {
+    setAlunosState([]);
+    setLoadingState(true);
+    fetch('/alunos')
+      .then(res => res.json())
+      .then(setAlunosState)
+      .finally(() => setLoadingState(false));
+  }, [loading, turmas]);
+
+  // Sugestões de nomes de alunos para autocomplete
+  const nomesAlunos = Array.from(new Set(alunosState.map(a => a.nome)));
+
   const handleDelete = async (id: number) => {
     await fetch(`/alunos/${id}`, { method: 'DELETE' });
-    fetchAlunos();
+    setLoadingState(true);
+    fetch('/alunos').then(res => res.json()).then(setAlunosState).finally(() => setLoadingState(false));
   };
 
   const handleEdit = (aluno: Aluno) => {
@@ -43,7 +58,8 @@ const AlunoList: React.FC<Props> = ({ alunos, turmas, fetchAlunos, loading }) =>
     setEditId(null);
     setEditNome('');
     setEditTurmaId('');
-    fetchAlunos();
+    setLoadingState(true);
+    fetch('/alunos').then(res => res.json()).then(setAlunosState).finally(() => setLoadingState(false));
   };
 
   return (
@@ -56,12 +72,18 @@ const AlunoList: React.FC<Props> = ({ alunos, turmas, fetchAlunos, loading }) =>
           onChange={e => setSearch(e.target.value)}
           placeholder="Pesquisar aluno pelo nome"
           style={{ flex: 1, borderRadius: 8, border: '1px solid #ccc', padding: 8 }}
+          list="sugestoes-aluno-busca"
         />
+        <datalist id="sugestoes-aluno-busca">
+          {nomesAlunos.map(nome => (
+            <option key={nome} value={nome} />
+          ))}
+        </datalist>
         <button className="btn-pill" type="button" onClick={() => setSearch('')}>Limpar</button>
       </div>
-      {loading ? <p>Carregando...</p> : (
+      {loadingState ? <p>Carregando...</p> : (
         <ul>
-          {alunos
+          {alunosState
             .filter(aluno => aluno.nome.toLowerCase().includes(search.toLowerCase()))
             .map(aluno => (
               <li key={aluno.id} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -72,7 +94,13 @@ const AlunoList: React.FC<Props> = ({ alunos, turmas, fetchAlunos, loading }) =>
                       value={editNome}
                       onChange={e => setEditNome(e.target.value)}
                       style={{ flex: 1, borderRadius: 8, border: '1px solid #ccc', padding: 8 }}
+                      list="sugestoes-aluno-editar"
                     />
+                    <datalist id="sugestoes-aluno-editar">
+                      {nomesAlunos.map(nome => (
+                        <option key={nome} value={nome} />
+                      ))}
+                    </datalist>
                     <select
                       value={editTurmaId}
                       onChange={e => setEditTurmaId(Number(e.target.value))}
