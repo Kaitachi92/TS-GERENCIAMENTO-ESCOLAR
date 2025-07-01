@@ -16,5 +16,10 @@ build/
 .DS_Store
 Thumbs.db
 
+# Backups (não versionar arquivos de backup - podem ser grandes)
+backups/
+*.sql
+backup_*.sql
+
 # Ignorar sub-repositório que causa erro no git add
 TS-GERENCIAMENTO-ESCOLAR/
