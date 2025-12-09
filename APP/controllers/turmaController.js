@@ -22,7 +22,14 @@ exports.criarTurma = async (req, res) => {
   }
   try {
     const result = await pool.query('INSERT INTO turmas (nome) VALUES ($1) RETURNING *', [nome]);
-    return res.status(201).json(result.rows[0]);
+    const turma = result.rows[0];
+    
+    // Broadcast via WebSocket
+    if (global.broadcastChange) {
+      global.broadcastChange('CREATE', 'turma', turma);
+    }
+    
+    return res.status(201).json(turma);
   } catch (err) {
     return res.status(500).json({ erro: 'Erro ao criar turma.' });
   }
@@ -48,7 +55,15 @@ exports.atualizarTurma = async (req, res) => {
   try {
     const result = await pool.query('UPDATE turmas SET nome = $1 WHERE id = $2 RETURNING *', [nome, id]);
     if (result.rows.length === 0) return res.status(404).json({ erro: 'Turma não encontrada.' });
-    return res.json(result.rows[0]);
+    
+    const turma = result.rows[0];
+    
+    // Broadcast via WebSocket
+    if (global.broadcastChange) {
+      global.broadcastChange('UPDATE', 'turma', turma);
+    }
+    
+    return res.json(turma);
   } catch (err) {
     return res.status(500).json({ erro: 'Erro ao atualizar turma.' });
   }
@@ -59,6 +74,12 @@ exports.deletarTurma = async (req, res) => {
   try {
     const result = await pool.query('DELETE FROM turmas WHERE id = $1 RETURNING *', [id]);
     if (result.rows.length === 0) return res.status(404).json({ erro: 'Turma não encontrada.' });
+    
+    // Broadcast via WebSocket
+    if (global.broadcastChange) {
+      global.broadcastChange('DELETE', 'turma', { id });
+    }
+    
     res.status(204).send();
   } catch (err) {
     res.status(500).json({ erro: 'Erro ao deletar turma.' });

@@ -1,0 +1,295 @@
+.turma-view {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+
+  .view-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #28a745;
+
+    h1 {
+      margin: 0;
+      color: #333;
+      font-size: 2em;
+    }
+
+    .websocket-status {
+      .status-indicator {
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 0.9em;
+        font-weight: 600;
+
+        &.connected {
+          background-color: #e8f5e9;
+          color: #2e7d32;
+        }
+
+        &.disconnected {
+          background-color: #ffebee;
+          color: #c62828;
+        }
+      }
+    }
+  }
+
+  .error-message {
+    background-color: #ffebee;
+    color: #c62828;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border-left: 4px solid #c62828;
+  }
+
+  .form-section {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+
+    h2 {
+      margin-top: 0;
+      margin-bottom: 20px;
+      color: #28a745;
+    }
+
+    .turma-form {
+      .form-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-bottom: 20px;
+      }
+
+      .form-group {
+        display: flex;
+        flex-direction: column;
+
+        label {
+          margin-bottom: 8px;
+          font-weight: 600;
+          color: #555;
+          font-size: 0.95em;
+        }
+
+        input,
+        select {
+          padding: 12px;
+          border: 2px solid #e0e0e0;
+          border-radius: 8px;
+          font-size: 1em;
+          transition: all 0.3s ease;
+
+          &:focus {
+            outline: none;
+            border-color: #28a745;
+            box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1);
+          }
+        }
+      }
+
+      .form-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 25px;
+
+        .btn {
+          padding: 12px 24px;
+          border: none;
+          border-radius: 8px;
+          font-size: 1em;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s ease;
+
+          &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+          }
+
+          &.btn-primary {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+
+            &:hover:not(:disabled) {
+              transform: translateY(-2px);
+              box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+            }
+          }
+
+          &.btn-secondary {
+            background-color: #e0e0e0;
+            color: #555;
+
+            &:hover {
+              background-color: #d0d0d0;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .list-section {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+    .list-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+
+      h2 {
+        margin: 0;
+        color: #28a745;
+      }
+
+      .search-input {
+        padding: 10px 16px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        width: 300px;
+        font-size: 0.95em;
+
+        &:focus {
+          outline: none;
+          border-color: #28a745;
+        }
+      }
+    }
+
+    .loading,
+    .no-data {
+      text-align: center;
+      padding: 40px;
+      color: #999;
+      font-size: 1.1em;
+    }
+
+    .table-container {
+      overflow-x: auto;
+
+      .turma-table {
+        width: 100%;
+        border-collapse: collapse;
+
+        thead {
+          tr {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+
+            th {
+              padding: 15px;
+              text-align: left;
+              color: white;
+              font-weight: 600;
+              font-size: 0.95em;
+              border: none;
+            }
+          }
+        }
+
+        tbody {
+          tr {
+            border-bottom: 1px solid #e0e0e0;
+            transition: background-color 0.2s ease;
+
+            &:hover {
+              background-color: #f5f5f5;
+            }
+
+            td {
+              padding: 15px;
+              color: #333;
+
+              .badge {
+                display: inline-block;
+                padding: 4px 12px;
+                border-radius: 12px;
+                font-size: 0.85em;
+                font-weight: 600;
+
+                &.badge-matutino {
+                  background-color: #fff3cd;
+                  color: #856404;
+                }
+
+                &.badge-vespertino {
+                  background-color: #cfe2ff;
+                  color: #084298;
+                }
+
+                &.badge-noturno {
+                  background-color: #e2e3e5;
+                  color: #383d41;
+                }
+
+                &.badge-integral {
+                  background-color: #d1ecf1;
+                  color: #0c5460;
+                }
+              }
+
+              &.actions {
+                display: flex;
+                gap: 8px;
+
+                .btn-icon {
+                  background: none;
+                  border: none;
+                  font-size: 1.3em;
+                  cursor: pointer;
+                  padding: 5px;
+                  border-radius: 4px;
+                  transition: all 0.2s ease;
+
+                  &.btn-edit:hover {
+                    background-color: #e3f2fd;
+                    transform: scale(1.1);
+                  }
+
+                  &.btn-delete:hover {
+                    background-color: #ffebee;
+                    transform: scale(1.1);
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .turma-view {
+    .view-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 15px;
+    }
+
+    .form-section .turma-form .form-row {
+      grid-template-columns: 1fr;
+    }
+
+    .list-section .list-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 15px;
+
+      .search-input {
+        width: 100%;
+      }
+    }
+  }
+}

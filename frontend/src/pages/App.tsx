@@ -1,122 +1,69 @@
-import React, { useEffect, useState } from 'react';
-import AlunoList from '../components/AlunoList';
-import CadastroAluno from '../components/CadastroAluno';
-import RelatorioGeral from '../components/RelatorioGeral';
-import ProfessorList from '../components/ProfessorList';
-import ResponsavelList from '../components/ResponsavelList';
-import DisciplinaList from '../components/DisciplinaList';
-import MensalidadeList from '../components/MensalidadeList';
-import TurmaList from '../components/TurmaList';
+import React, { useState } from 'react';
+import AlunoView from '../views/AlunoView';
+import TurmaView from '../views/TurmaView';
 import '../styles/global.scss';
 
-type Aluno = {
-  id: number;
-  nome: string;
-  turma_id?: number;
-  // outros campos opcionais
-};
-type Turma = { id: number; nome: string };
-type Responsavel = {
-  id: number;
-  nome: string;
-  parentesco: string;
-  telefone: string;
-  email: string;
-  endereco: string;
-};
-
 const App: React.FC = () => {
-  const [alunos, setAlunos] = useState<Aluno[]>([]);
-  const [turmas, setTurmas] = useState<Turma[]>([]);
-  const [responsaveis, setResponsaveis] = useState<Responsavel[]>([]);
-  const [loadingAlunos, setLoadingAlunos] = useState(false);
-  const [loadingTurmas, setLoadingTurmas] = useState(false);
-  const [loadingResponsaveis, setLoadingResponsaveis] = useState(false);
-  const [aba, setAba] = useState('alunos');
-
-  const fetchAlunos = () => {
-    setLoadingAlunos(true);
-    fetch('/alunos')
-      .then(res => res.json())
-      .then(data => setAlunos(Array.isArray(data) ? data : []))
-      .finally(() => setLoadingAlunos(false));
-  };
-  const fetchTurmas = () => {
-    setLoadingTurmas(true);
-    fetch('/turmas')
-      .then(res => res.json())
-      .then(data => setTurmas(Array.isArray(data) ? data : []))
-      .finally(() => setLoadingTurmas(false));
-  };
-  const fetchResponsaveis = () => {
-    setLoadingResponsaveis(true);
-    fetch('/responsaveis')
-      .then(res => res.json())
-      .then(data => setResponsaveis(Array.isArray(data) ? data : []))
-      .finally(() => setLoadingResponsaveis(false));
-  };
-
-  useEffect(() => {
-    fetchAlunos();
-    fetchTurmas();
-    fetchResponsaveis();
-  }, []);
+  const [aba, setAba] = useState<'alunos' | 'turmas'>('alunos');
 
   return (
     <>
-      <header>
-        <h1>Sistema de Gerenciamento Escolar Infantil - Backend</h1>
-        <p>Organização, clareza e eficiência no gerenciamento escolar.</p>
+      <header style={{ 
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        color: 'white',
+        padding: '30px 20px',
+        textAlign: 'center',
+        marginBottom: '30px'
+      }}>
+        <h1 style={{ margin: 0, fontSize: '2.5em' }}>
+          📚 Sistema de Gerenciamento Escolar
+        </h1>
+        <p style={{ margin: '10px 0 0 0', fontSize: '1.1em', opacity: 0.9 }}>
+          React + TypeScript + WebSocket - Prova Final
+        </p>
       </header>
-      <nav style={{ display: 'flex', gap: 16, margin: '24px 0' }}>
-        <button className={aba === 'alunos' ? 'btn-pill active' : 'btn-pill'} onClick={() => setAba('alunos')}>Alunos</button>
-        <button className={aba === 'professores' ? 'btn-pill active' : 'btn-pill'} onClick={() => setAba('professores')}>Professores</button>
-        <button className={aba === 'turmas' ? 'btn-pill active' : 'btn-pill'} onClick={() => setAba('turmas')}>Turmas</button>
-        <button className={aba === 'responsaveis' ? 'btn-pill active' : 'btn-pill'} onClick={() => setAba('responsaveis')}>Responsáveis</button>
-        <button className={aba === 'disciplinas' ? 'btn-pill active' : 'btn-pill'} onClick={() => setAba('disciplinas')}>Disciplinas</button>
-        <button className={aba === 'mensalidades' ? 'btn-pill active' : 'btn-pill'} onClick={() => setAba('mensalidades')}>Mensalidades</button>
-        <button className={aba === 'relatorio' ? 'btn-pill active' : 'btn-pill'} onClick={() => setAba('relatorio')}>Relatório Geral</button>
+      
+      <nav style={{ 
+        display: 'flex', 
+        gap: 16, 
+        margin: '0 20px 30px 20px',
+        justifyContent: 'center'
+      }}>
+        <button 
+          className={aba === 'alunos' ? 'btn-tab active' : 'btn-tab'} 
+          onClick={() => setAba('alunos')}
+        >
+          👨‍🎓 Alunos
+        </button>
+        <button 
+          className={aba === 'turmas' ? 'btn-tab active' : 'btn-tab'} 
+          onClick={() => setAba('turmas')}
+        >
+          🏫 Turmas
+        </button>
       </nav>
-      <main className="container">
-        {aba === 'alunos' && (
-          <section className="section-card">
-            <CadastroAluno turmas={turmas} fetchAlunos={fetchAlunos} fetchResponsaveis={fetchResponsaveis} />
-            <AlunoList turmas={turmas} fetchAlunos={fetchAlunos} loading={loadingAlunos} />
-          </section>
-        )}
-        {aba === 'professores' && (
-          <section className="section-card">
-            <ProfessorList />
-          </section>
-        )}
-        {aba === 'turmas' && (
-          <section className="section-card">
-            <TurmaList onTurmasChange={fetchTurmas} />
-          </section>
-        )}
-        {aba === 'responsaveis' && (
-          <section className="section-card">
-            <ResponsavelList />
-          </section>
-        )}
-        {aba === 'disciplinas' && (
-          <section className="section-card">
-            <DisciplinaList />
-          </section>
-        )}
-        {aba === 'mensalidades' && (
-          <section className="section-card">
-            <MensalidadeList />
-          </section>
-        )}
-        {aba === 'relatorio' && (
-          <section className="section-card">
-            <RelatorioGeral />
-          </section>
-        )}
+      
+      <main>
+        {aba === 'alunos' && <AlunoView />}
+        {aba === 'turmas' && <TurmaView />}
       </main>
+
+      <footer style={{
+        textAlign: 'center',
+        padding: '30px 20px',
+        marginTop: '50px',
+        color: '#999',
+        borderTop: '1px solid #e0e0e0'
+      }}>
+        <p>✅ Views funcionando + Backend API em Docker</p>
+        <p>⚡ Vite como pré-compilador</p>
+        <p>📘 TypeScript no frontend (React + TS)</p>
+        <p>📄 Views EJS implementadas</p>
+        <p>🔌 WebSocket + Custom Hook</p>
+      </footer>
     </>
   );
 };
 
 export default App;
+
