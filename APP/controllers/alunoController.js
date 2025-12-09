@@ -19,15 +19,15 @@ exports.listarAlunos = async (req, res) => {
 };
 
 exports.criarAluno = async (req, res) => {
-  const { nome, turma_id } = req.body;
+  const { nome, turma_id, data_nascimento, endereco, telefone } = req.body;
   if (!validarNome(nome)) {
     return res.status(400).json({ erro: 'Nome é obrigatório.' });
   }
-  if (!validarTurmaId(Number(turma_id))) {
-    return res.status(400).json({ erro: 'Turma é obrigatória.' });
-  }
   try {
-    const result = await pool.query('INSERT INTO alunos (nome, turma_id) VALUES ($1, $2) RETURNING *', [nome, turma_id]);
+    const result = await pool.query(
+      'INSERT INTO alunos (nome, turma_id, data_nascimento, endereco, telefone) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+      [nome, turma_id || null, data_nascimento || null, endereco || null, telefone || null]
+    );
     const aluno = result.rows[0];
     
     // Broadcast via WebSocket
@@ -37,8 +37,8 @@ exports.criarAluno = async (req, res) => {
     
     return res.status(201).json(aluno);
   } catch (err) {
-    console.error('Erro ao criar aluno:', err); // Adiciona log detalhado
-    return res.status(500).json({ erro: 'Erro ao criar aluno.' });
+    console.error('Erro ao criar aluno:', err.message, err.stack);
+    return res.status(500).json({ erro: 'Erro ao criar aluno.', detalhes: err.message });
   }
 };
 
@@ -55,15 +55,15 @@ exports.buscarAluno = async (req, res) => {
 
 exports.atualizarAluno = async (req, res) => {
   const id = parseInt(req.params.id);
-  const { nome, turma_id } = req.body;
+  const { nome, turma_id, data_nascimento, endereco, telefone } = req.body;
   if (!validarNome(nome)) {
     return res.status(400).json({ erro: 'Nome é obrigatório.' });
   }
-  if (!validarTurmaId(Number(turma_id))) {
-    return res.status(400).json({ erro: 'Turma é obrigatória.' });
-  }
   try {
-    const result = await pool.query('UPDATE alunos SET nome = $1, turma_id = $2 WHERE id = $3 RETURNING *', [nome, turma_id, id]);
+    const result = await pool.query(
+      'UPDATE alunos SET nome = $1, turma_id = $2, data_nascimento = $3, endereco = $4, telefone = $5 WHERE id = $6 RETURNING *',
+      [nome, turma_id || null, data_nascimento || null, endereco || null, telefone || null, id]
+    );
     if (result.rows.length === 0) return res.status(404).json({ erro: 'Aluno não encontrado.' });
     
     const aluno = result.rows[0];
@@ -75,7 +75,8 @@ exports.atualizarAluno = async (req, res) => {
     
     return res.json(aluno);
   } catch (err) {
-    return res.status(500).json({ erro: 'Erro ao atualizar aluno.' });
+    console.error('Erro ao atualizar aluno:', err.message);
+    return res.status(500).json({ erro: 'Erro ao atualizar aluno.', detalhes: err.message });
   }
 };
 

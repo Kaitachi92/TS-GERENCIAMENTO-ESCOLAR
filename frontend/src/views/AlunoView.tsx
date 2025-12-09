@@ -23,7 +23,7 @@ const AlunoView: React.FC = () => {
     data_nascimento: '',
     turma_id: undefined,
     endereco: '',
-    telefone_contato: '',
+    telefone: '',
   });
 
   // WebSocket hook
@@ -89,7 +89,7 @@ const AlunoView: React.FC = () => {
         data_nascimento: '',
         turma_id: undefined,
         endereco: '',
-        telefone_contato: '',
+        telefone: '',
       });
       setFormMode('create');
       setEditingId(null);
@@ -111,7 +111,7 @@ const AlunoView: React.FC = () => {
       data_nascimento: aluno.data_nascimento || '',
       turma_id: aluno.turma_id,
       endereco: aluno.endereco || '',
-      telefone_contato: aluno.telefone_contato || '',
+      telefone: aluno.telefone || '',
     });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -141,7 +141,7 @@ const AlunoView: React.FC = () => {
       data_nascimento: '',
       turma_id: undefined,
       endereco: '',
-      telefone_contato: '',
+      telefone: '',
     });
   };
 
@@ -207,12 +207,12 @@ const AlunoView: React.FC = () => {
               </select>
             </div>
             <div className="form-group">
-              <label htmlFor="telefone_contato">Telefone</label>
+              <label htmlFor="telefone">Telefone</label>
               <input
-                id="telefone_contato"
+                id="telefone"
                 type="tel"
-                value={formData.telefone_contato}
-                onChange={(e) => setFormData({ ...formData, telefone_contato: e.target.value })}
+                value={formData.telefone}
+                onChange={(e) => setFormData({ ...formData, telefone: e.target.value })}
                 placeholder="(00) 00000-0000"
               />
             </div>
@@ -287,7 +287,7 @@ const AlunoView: React.FC = () => {
                           : 'N/A'}
                       </td>
                       <td>{turma ? turma.nome : 'Sem turma'}</td>
-                      <td>{aluno.telefone_contato || 'N/A'}</td>
+                      <td>{aluno.telefone || 'N/A'}</td>
                       <td className="actions">
                         <button
                           onClick={() => handleEdit(aluno)}

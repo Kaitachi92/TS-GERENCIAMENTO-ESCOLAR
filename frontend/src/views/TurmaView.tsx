@@ -19,10 +19,9 @@ const TurmaView: React.FC = () => {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [formData, setFormData] = useState<Partial<Turma>>({
     nome: '',
-    ano_escolar: '',
+    ano_letivo: undefined,
     turno: '',
-    sala: '',
-    capacidade_maxima: undefined,
+    nivel_ensino: '',
   });
 
   // WebSocket hook
@@ -75,10 +74,9 @@ const TurmaView: React.FC = () => {
       // Resetar formulário
       setFormData({
         nome: '',
-        ano_escolar: '',
+        ano_letivo: undefined,
         turno: '',
-        sala: '',
-        capacidade_maxima: undefined,
+        nivel_ensino: '',
       });
       setFormMode('create');
       setEditingId(null);
@@ -97,10 +95,9 @@ const TurmaView: React.FC = () => {
     setEditingId(turma.id);
     setFormData({
       nome: turma.nome,
-      ano_escolar: turma.ano_escolar || '',
+      ano_letivo: turma.ano_letivo,
       turno: turma.turno || '',
-      sala: turma.sala || '',
-      capacidade_maxima: turma.capacidade_maxima,
+      nivel_ensino: turma.nivel_ensino || '',
     });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -127,10 +124,9 @@ const TurmaView: React.FC = () => {
     setEditingId(null);
     setFormData({
       nome: '',
-      ano_escolar: '',
+      ano_letivo: undefined,
       turno: '',
-      sala: '',
-      capacidade_maxima: undefined,
+      nivel_ensino: '',
     });
   };
 
@@ -169,13 +165,13 @@ const TurmaView: React.FC = () => {
               />
             </div>
             <div className="form-group">
-              <label htmlFor="ano_escolar">Ano Escolar</label>
+              <label htmlFor="ano_letivo">Ano Letivo</label>
               <input
-                id="ano_escolar"
-                type="text"
-                value={formData.ano_escolar}
-                onChange={(e) => setFormData({ ...formData, ano_escolar: e.target.value })}
-                placeholder="Ex: 1º Ano, 2º Ano"
+                id="ano_letivo"
+                type="number"
+                value={formData.ano_letivo || ''}
+                onChange={(e) => setFormData({ ...formData, ano_letivo: e.target.value ? Number(e.target.value) : undefined })}
+                placeholder="Ex: 2025"
               />
             </div>
           </div>
@@ -189,31 +185,20 @@ const TurmaView: React.FC = () => {
                 onChange={(e) => setFormData({ ...formData, turno: e.target.value })}
               >
                 <option value="">Selecione um turno</option>
-                <option value="Matutino">Matutino</option>
-                <option value="Vespertino">Vespertino</option>
-                <option value="Noturno">Noturno</option>
+                <option value="Manhã">Manhã</option>
+                <option value="Tarde">Tarde</option>
+                <option value="Noite">Noite</option>
                 <option value="Integral">Integral</option>
               </select>
             </div>
             <div className="form-group">
-              <label htmlFor="sala">Sala</label>
+              <label htmlFor="nivel_ensino">Nível de Ensino</label>
               <input
-                id="sala"
+                id="nivel_ensino"
                 type="text"
-                value={formData.sala}
-                onChange={(e) => setFormData({ ...formData, sala: e.target.value })}
-                placeholder="Ex: Sala 101"
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="capacidade_maxima">Capacidade Máxima</label>
-              <input
-                id="capacidade_maxima"
-                type="number"
-                min="1"
-                value={formData.capacidade_maxima || ''}
-                onChange={(e) => setFormData({ ...formData, capacidade_maxima: e.target.value ? Number(e.target.value) : undefined })}
-                placeholder="Ex: 30"
+                value={formData.nivel_ensino}
+                onChange={(e) => setFormData({ ...formData, nivel_ensino: e.target.value })}
+                placeholder="Ex: Fundamental, Infantil"
               />
             </div>
           </div>
@@ -257,10 +242,9 @@ const TurmaView: React.FC = () => {
                 <tr>
                   <th>ID</th>
                   <th>Nome</th>
-                  <th>Ano Escolar</th>
+                  <th>Ano Letivo</th>
                   <th>Turno</th>
-                  <th>Sala</th>
-                  <th>Capacidade</th>
+                  <th>Nível Ensino</th>
                   <th>Ações</th>
                 </tr>
               </thead>
@@ -269,7 +253,7 @@ const TurmaView: React.FC = () => {
                   <tr key={turma.id}>
                     <td>#{turma.id}</td>
                     <td><strong>{turma.nome}</strong></td>
-                    <td>{turma.ano_escolar || 'N/A'}</td>
+                    <td>{turma.ano_letivo || 'N/A'}</td>
                     <td>
                       {turma.turno && (
                         <span className={`badge badge-${turma.turno.toLowerCase()}`}>
@@ -278,8 +262,7 @@ const TurmaView: React.FC = () => {
                       )}
                       {!turma.turno && 'N/A'}
                     </td>
-                    <td>{turma.sala || 'N/A'}</td>
-                    <td>{turma.capacidade_maxima || 'N/A'}</td>
+                    <td>{turma.nivel_ensino || 'N/A'}</td>
                     <td className="actions">
                       <button
                         onClick={() => handleEdit(turma)}

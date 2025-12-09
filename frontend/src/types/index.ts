@@ -9,7 +9,7 @@ export interface Aluno {
   turma_id?: number;
   responsavel_id?: number;
   endereco?: string;
-  telefone_contato?: string;
+  telefone?: string;
   created_at?: string;
   updated_at?: string;
 }
@@ -17,10 +17,9 @@ export interface Aluno {
 export interface Turma {
   id: number;
   nome: string;
-  ano_escolar?: string;
+  ano_letivo?: number;
   turno?: string;
-  sala?: string;
-  capacidade_maxima?: number;
+  nivel_ensino?: string;
   created_at?: string;
   updated_at?: string;
 }
